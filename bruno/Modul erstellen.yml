@@ -1,0 +1,25 @@
+info:
+  name: Modul erstellen
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/module
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Algorithmen und Datenstrukturen",
+        "kuerzel": "ADS",
+        "ects": 10,
+        "semester": 2
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

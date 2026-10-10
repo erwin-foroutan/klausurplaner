@@ -1,0 +1,19 @@
+info:
+  name: Studienbeginn setzen
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: http://localhost:8080/studienprofil
+  body:
+    type: json
+    data: '{ "startJahr": 2025}'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

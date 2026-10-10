@@ -1,0 +1,19 @@
+info:
+  name: Prüfung anmelden
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:8080/pruefungen
+  body:
+    type: json
+    data: '{"modulId": 11,"datum": "2027-02-10"}'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -1,0 +1,19 @@
+info:
+  name: Lerneinheit erfassen
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: http://localhost:8080/lerneinheiten
+  body:
+    type: json
+    data: '{ "modulId": 12, "dauerMinuten": 90, "thema": "UML-Klassendiagramme" }'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

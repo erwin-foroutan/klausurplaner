@@ -1,0 +1,19 @@
+info:
+  name: Ergebnis nachtragen
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:8080/pruefungen/nachtragen
+  body:
+    type: json
+    data: '{"modulId":6, "datum": "2026-08-01", "status": "BESTANDEN", "note": 2.0}'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

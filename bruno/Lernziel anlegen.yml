@@ -1,0 +1,19 @@
+info:
+  name: Lernziel anlegen
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:8080/lernziele
+  body:
+    type: json
+    data: '{"modulId":12, "zielStunden":10, "startDatum":"2026-10-01", "deadline":"2027-02-15", "beschreibung": "Vorbereitung Klausur"}'
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
