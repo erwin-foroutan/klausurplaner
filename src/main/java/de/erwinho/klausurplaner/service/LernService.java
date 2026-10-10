@@ -1,5 +1,6 @@
 package de.erwinho.klausurplaner.service;
 
+import de.erwinho.klausurplaner.dto.LernzielResponse;
 import de.erwinho.klausurplaner.entity.Lerneinheit;
 import de.erwinho.klausurplaner.entity.Lernziel;
 import de.erwinho.klausurplaner.entity.Modul;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -62,7 +64,21 @@ public class LernService {
         return summeMinuten(lerneinheitRepository.findByModulIdAndDatumBetween(
                 ziel.getModul().getId(), ziel.getStartDatum(), ziel.getDeadline()));
     }
-
+    public LernzielResponse alsResponse(Lernziel ziel) {
+        int minuten = gelernteMinuten(ziel);
+        long tage = Math.max(0, ChronoUnit.DAYS.between(LocalDate.now(), ziel.getDeadline()));
+        return new LernzielResponse(
+                ziel.getId(),
+                ziel.getModul().getId(),
+                ziel.getModul().getName(),
+                ziel.getZielStunden(),
+                ziel.getStartDatum(),
+                ziel.getDeadline(),
+                ziel.getBeschreibung(),
+                minuten,
+                fortschrittProzent(minuten, ziel.getZielStunden()),
+                tage);
+    }
     private Modul findeModul(Long modulId) {
         return modulRepository.findById(modulId)
                 .orElseThrow(() -> new IllegalArgumentException("Modul mit ID " + modulId + " nicht gefunden"));
