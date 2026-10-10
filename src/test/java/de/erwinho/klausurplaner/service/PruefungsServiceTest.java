@@ -72,4 +72,53 @@ class PruefungsServiceTest {
         assertFalse(PruefungsService.istLetzterVersuch(liste));
         assertFalse(PruefungsService.istEndgueltigNichtBestanden(liste));
     }
+    // ---------- Ergebnis eintragen ----------
+
+    private Pruefungsanmeldung offeneAnmeldung() {
+        Pruefungsanmeldung a = new Pruefungsanmeldung();
+        a.setStatus(ANGEMELDET);
+        return a;
+    }
+
+    @Test
+    void bestandenMitGueltigerNoteWirdGespeichert() {
+        var a = offeneAnmeldung();
+        PruefungsService.setzeErgebnis(a, BESTANDEN, 2.3);
+        assertEquals(BESTANDEN, a.getStatus());
+        assertEquals(2.3, a.getNote());
+    }
+
+    @Test
+    void bestandenOhneNoteIstNichtErlaubt() {
+        assertThrows(IllegalArgumentException.class,
+                () -> PruefungsService.setzeErgebnis(offeneAnmeldung(), BESTANDEN, null));
+    }
+
+    @Test
+    void noteSchlechterAlsVierBeiBestandenIstNichtErlaubt() {
+        assertThrows(IllegalArgumentException.class,
+                () -> PruefungsService.setzeErgebnis(offeneAnmeldung(), BESTANDEN, 4.3));
+    }
+
+    @Test
+    void nichtBestandenBekommtAutomatischFuenf() {
+        var a = offeneAnmeldung();
+        PruefungsService.setzeErgebnis(a, NICHT_BESTANDEN, null);
+        assertEquals(5.0, a.getNote());
+    }
+
+    @Test
+    void nichtAngetretenHatKeineNote() {
+        var a = offeneAnmeldung();
+        PruefungsService.setzeErgebnis(a, NICHT_ANGETRETEN, 1.0);
+        assertNull(a.getNote());
+    }
+
+    @Test
+    void ergebnisKannNurEinmalEingetragenWerden() {
+        var a = offeneAnmeldung();
+        PruefungsService.setzeErgebnis(a, NICHT_BESTANDEN, null);
+        assertThrows(IllegalStateException.class,
+                () -> PruefungsService.setzeErgebnis(a, BESTANDEN, 1.7));
+    }
 }

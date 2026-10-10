@@ -33,7 +33,30 @@ public class PruefungsService {
         anmeldung.setStatus(PruefungsStatus.ANGEMELDET);
         return anmeldungRepository.save(anmeldung);
     }
+    public Pruefungsanmeldung ergebnisEintragen(Long anmeldungId, PruefungsStatus status, Double note) {
+        Pruefungsanmeldung anmeldung = anmeldungRepository.findById(anmeldungId)
+                .orElseThrow(() -> new IllegalArgumentException("Anmeldung mit ID " + anmeldungId + " nicht gefunden"));
+        setzeErgebnis(anmeldung, status, note);
+        return anmeldungRepository.save(anmeldung);
+    }
 
+    static void setzeErgebnis(Pruefungsanmeldung anmeldung, PruefungsStatus status, Double note) {
+        if (anmeldung.getStatus() != PruefungsStatus.ANGEMELDET) {
+            throw new IllegalStateException("Für diese Anmeldung wurde bereits ein Ergebnis eingetragen");
+        }
+        switch (status) {
+            case BESTANDEN -> {
+                if (note == null || note < 1.0 || note > 4.0) {
+                    throw new IllegalArgumentException("Bei bestanden muss die Note zwischen 1,0 und 4,0 liegen");
+                }
+                anmeldung.setNote(note);
+            }
+            case NICHT_BESTANDEN -> anmeldung.setNote(5.0);
+            case NICHT_ANGETRETEN -> anmeldung.setNote(null);
+            case ANGEMELDET -> throw new IllegalArgumentException("ANGEMELDET ist kein Ergebnis");
+        }
+        anmeldung.setStatus(status);
+    }
     static long fehlversuche(List<Pruefungsanmeldung> anmeldungen) {
         return anmeldungen.stream()
                 .filter(a -> a.getStatus() == PruefungsStatus.NICHT_BESTANDEN)
