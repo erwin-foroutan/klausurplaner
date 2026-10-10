@@ -1,5 +1,6 @@
 package de.erwinho.klausurplaner.service;
 
+import de.erwinho.klausurplaner.entity.ModulStatus;
 import de.erwinho.klausurplaner.entity.Pruefungsanmeldung;
 import de.erwinho.klausurplaner.entity.PruefungsStatus;
 import org.junit.jupiter.api.Test;
@@ -120,5 +121,34 @@ class PruefungsServiceTest {
         PruefungsService.setzeErgebnis(a, NICHT_BESTANDEN, null);
         assertThrows(IllegalStateException.class,
                 () -> PruefungsService.setzeErgebnis(a, BESTANDEN, 1.7));
+    }
+    // ---------- Modulstatus ----------
+
+    @Test
+    void ohneAnmeldungIstModulOffen() {
+        assertEquals(ModulStatus.OFFEN, PruefungsService.bestimmeStatus(anmeldungen()));
+    }
+
+    @Test
+    void nachNichtAntretenIstModulWiederOffen() {
+        assertEquals(ModulStatus.OFFEN, PruefungsService.bestimmeStatus(anmeldungen(NICHT_ANGETRETEN)));
+    }
+
+    @Test
+    void offeneAnmeldungErgibtAngemeldet() {
+        assertEquals(ModulStatus.ANGEMELDET,
+                PruefungsService.bestimmeStatus(anmeldungen(NICHT_BESTANDEN, ANGEMELDET)));
+    }
+
+    @Test
+    void bestandenNachFehlversuchenErgibtBestanden() {
+        assertEquals(ModulStatus.BESTANDEN,
+                PruefungsService.bestimmeStatus(anmeldungen(NICHT_BESTANDEN, NICHT_BESTANDEN, BESTANDEN)));
+    }
+
+    @Test
+    void dreiFehlversucheErgebenEndgueltigNichtBestanden() {
+        assertEquals(ModulStatus.ENDGUELTIG_NICHT_BESTANDEN,
+                PruefungsService.bestimmeStatus(anmeldungen(NICHT_BESTANDEN, NICHT_BESTANDEN, NICHT_BESTANDEN)));
     }
 }

@@ -1,6 +1,7 @@
 package de.erwinho.klausurplaner.service;
 
 import de.erwinho.klausurplaner.entity.Modul;
+import de.erwinho.klausurplaner.entity.ModulStatus;
 import de.erwinho.klausurplaner.entity.Pruefungsanmeldung;
 import de.erwinho.klausurplaner.entity.PruefungsStatus;
 import de.erwinho.klausurplaner.repository.ModulRepository;
@@ -88,5 +89,27 @@ public class PruefungsService {
         if (offeneAnmeldung) {
             throw new IllegalStateException("Es gibt bereits eine offene Anmeldung für dieses Modul");
         }
+    }
+    static ModulStatus bestimmeStatus(List<Pruefungsanmeldung> anmeldungen) {
+        if (istBestanden(anmeldungen)) {
+            return ModulStatus.BESTANDEN;
+        }
+        if (istEndgueltigNichtBestanden(anmeldungen)) {
+            return ModulStatus.ENDGUELTIG_NICHT_BESTANDEN;
+        }
+        boolean offeneAnmeldung = anmeldungen.stream()
+                .anyMatch(a -> a.getStatus() == PruefungsStatus.ANGEMELDET);
+        if (offeneAnmeldung) {
+            return ModulStatus.ANGEMELDET;
+        }
+        return ModulStatus.OFFEN;
+    }
+
+    static Double bestandeneNote(List<Pruefungsanmeldung> anmeldungen) {
+        return anmeldungen.stream()
+                .filter(a -> a.getStatus() == PruefungsStatus.BESTANDEN)
+                .map(Pruefungsanmeldung::getNote)
+                .findFirst()
+                .orElse(null);
     }
 }
