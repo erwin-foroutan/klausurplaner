@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Modul {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,4 +23,15 @@ public class Modul {
     private int ects;
 
     private int semester;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Kategorie kategorie;
+
+    public Modul(String name, int ects, int semester, Kategorie kategorie) {
+        this.name = name;
+        this.ects = ects;
+        this.semester = semester;
+        this.kategorie = kategorie;
+    }
 }
