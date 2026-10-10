@@ -4,6 +4,7 @@ import de.erwinho.klausurplaner.dto.StudienprofilRequest;
 import de.erwinho.klausurplaner.dto.StudienprofilResponse;
 import de.erwinho.klausurplaner.entity.Studienprofil;
 import de.erwinho.klausurplaner.service.StudienprofilService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class StudienprofilController {
     }
 
     @PutMapping
-    public StudienprofilResponse speichern(@RequestBody StudienprofilRequest request) {
+    public StudienprofilResponse speichern(@Valid @RequestBody StudienprofilRequest request) {
         Studienprofil profil = studienprofilService.speichern(request.startJahr());
         return new StudienprofilResponse(profil.getStartJahr(), studienprofilService.aktuellesSemester());
     }

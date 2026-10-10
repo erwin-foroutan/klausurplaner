@@ -5,6 +5,7 @@ import de.erwinho.klausurplaner.dto.LerneinheitResponse;
 import de.erwinho.klausurplaner.dto.LernzielRequest;
 import de.erwinho.klausurplaner.dto.LernzielResponse;
 import de.erwinho.klausurplaner.service.LernService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class LernController {
 
     @PostMapping("/lerneinheiten")
     @ResponseStatus(HttpStatus.CREATED)
-    public LerneinheitResponse lerneinheitErfassen(@RequestBody LerneinheitRequest r) {
+    public LerneinheitResponse lerneinheitErfassen(@Valid @RequestBody LerneinheitRequest r) {
         return LerneinheitResponse.von(lernService.lerneinheitErfassen(
                 r.modulId(), r.datum(), r.dauerMinuten(), r.thema(), r.notiz()));
     }
@@ -33,7 +34,7 @@ public class LernController {
 
     @PostMapping("/lernziele")
     @ResponseStatus(HttpStatus.CREATED)
-    public LernzielResponse lernzielAnlegen(@RequestBody LernzielRequest r) {
+    public LernzielResponse lernzielAnlegen(@Valid @RequestBody LernzielRequest r) {
         return lernService.alsResponse(lernService.lernzielAnlegen(
                 r.modulId(), r.zielStunden(), r.startDatum(), r.deadline(), r.beschreibung()));
     }

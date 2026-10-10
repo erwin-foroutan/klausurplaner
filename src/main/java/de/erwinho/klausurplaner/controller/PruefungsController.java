@@ -5,6 +5,7 @@ import de.erwinho.klausurplaner.dto.AnmeldungResponse;
 import de.erwinho.klausurplaner.dto.ErgebnisRequest;
 import de.erwinho.klausurplaner.dto.NachtragRequest;
 import de.erwinho.klausurplaner.service.PruefungsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,20 +19,20 @@ public class PruefungsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AnmeldungResponse anmelden(@RequestBody AnmeldungRequest request) {
+    public AnmeldungResponse anmelden(@Valid @RequestBody AnmeldungRequest request) {
         return AnmeldungResponse.von(
                 pruefungsService.anmelden(request.modulId(), request.datum()));
     }
 
     @PutMapping("/{id}/ergebnis")
     public AnmeldungResponse ergebnisEintragen(@PathVariable Long id,
-                                               @RequestBody ErgebnisRequest request) {
+                                               @Valid @RequestBody ErgebnisRequest request) {
         return AnmeldungResponse.von(
                 pruefungsService.ergebnisEintragen(id, request.status(), request.note()));
     }
     @PostMapping("/nachtragen")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnmeldungResponse nachtragen(@RequestBody NachtragRequest request) {
+    public AnmeldungResponse nachtragen(@Valid @RequestBody NachtragRequest request) {
         return AnmeldungResponse.von(
                 pruefungsService.nachtragen(request.modulId(), request.datum(), request.status(), request.note()));
     }
