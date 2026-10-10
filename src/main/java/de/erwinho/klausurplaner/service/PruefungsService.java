@@ -1,0 +1,69 @@
+package de.erwinho.klausurplaner.service;
+
+import de.erwinho.klausurplaner.entity.Modul;
+import de.erwinho.klausurplaner.entity.Pruefungsanmeldung;
+import de.erwinho.klausurplaner.entity.PruefungsStatus;
+import de.erwinho.klausurplaner.repository.ModulRepository;
+import de.erwinho.klausurplaner.repository.PruefungsanmeldungRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PruefungsService {
+
+    static final int MAX_VERSUCHE = 3;
+
+    private final PruefungsanmeldungRepository anmeldungRepository;
+    private final ModulRepository modulRepository;
+
+    public Pruefungsanmeldung anmelden(Long modulId, LocalDate datum) {
+        Modul modul = modulRepository.findById(modulId)
+                .orElseThrow(() -> new IllegalArgumentException("Modul mit ID " + modulId + " nicht gefunden"));
+
+        List<Pruefungsanmeldung> bisher = anmeldungRepository.findByModulId(modulId);
+        pruefeAnmeldungErlaubt(bisher);
+
+        Pruefungsanmeldung anmeldung = new Pruefungsanmeldung();
+        anmeldung.setModul(modul);
+        anmeldung.setDatum(datum);
+        anmeldung.setStatus(PruefungsStatus.ANGEMELDET);
+        return anmeldungRepository.save(anmeldung);
+    }
+
+    static long fehlversuche(List<Pruefungsanmeldung> anmeldungen) {
+        return anmeldungen.stream()
+                .filter(a -> a.getStatus() == PruefungsStatus.NICHT_BESTANDEN)
+                .count();
+    }
+
+    static boolean istBestanden(List<Pruefungsanmeldung> anmeldungen) {
+        return anmeldungen.stream()
+                .anyMatch(a -> a.getStatus() == PruefungsStatus.BESTANDEN);
+    }
+
+    static boolean istEndgueltigNichtBestanden(List<Pruefungsanmeldung> anmeldungen) {
+        return fehlversuche(anmeldungen) >= MAX_VERSUCHE;
+    }
+
+    static boolean istLetzterVersuch(List<Pruefungsanmeldung> anmeldungen) {
+        return !istBestanden(anmeldungen) && fehlversuche(anmeldungen) == MAX_VERSUCHE - 1;
+    }
+
+    static void pruefeAnmeldungErlaubt(List<Pruefungsanmeldung> anmeldungen) {
+        if (istBestanden(anmeldungen)) {
+            throw new IllegalStateException("Modul ist bereits bestanden");
+        }
+        if (istEndgueltigNichtBestanden(anmeldungen)) {
+            throw new IllegalStateException("Endgültig nicht bestanden – keine weitere Anmeldung möglich");
+        }
+        boolean offeneAnmeldung = anmeldungen.stream()
+                .anyMatch(a -> a.getStatus() == PruefungsStatus.ANGEMELDET);
+        if (offeneAnmeldung) {
+            throw new IllegalStateException("Es gibt bereits eine offene Anmeldung für dieses Modul");
+        }
+    }
+}
