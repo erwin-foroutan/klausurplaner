@@ -8,6 +8,7 @@ import de.erwinho.klausurplaner.repository.ModulRepository;
 import de.erwinho.klausurplaner.repository.PruefungsanmeldungRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,7 +41,12 @@ public class PruefungsService {
         setzeErgebnis(anmeldung, status, note);
         return anmeldungRepository.save(anmeldung);
     }
-
+    @Transactional
+    public Pruefungsanmeldung nachtragen(Long modulId, LocalDate datum, PruefungsStatus status, Double note) {
+        Pruefungsanmeldung anmeldung = anmelden(modulId, datum);
+        setzeErgebnis(anmeldung, status, note);
+        return anmeldungRepository.save(anmeldung);
+    }
     static void setzeErgebnis(Pruefungsanmeldung anmeldung, PruefungsStatus status, Double note) {
         if (anmeldung.getStatus() != PruefungsStatus.ANGEMELDET) {
             throw new IllegalStateException("Für diese Anmeldung wurde bereits ein Ergebnis eingetragen");

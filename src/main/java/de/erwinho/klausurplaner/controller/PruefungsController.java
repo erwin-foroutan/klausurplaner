@@ -3,6 +3,7 @@ package de.erwinho.klausurplaner.controller;
 import de.erwinho.klausurplaner.dto.AnmeldungRequest;
 import de.erwinho.klausurplaner.dto.AnmeldungResponse;
 import de.erwinho.klausurplaner.dto.ErgebnisRequest;
+import de.erwinho.klausurplaner.dto.NachtragRequest;
 import de.erwinho.klausurplaner.service.PruefungsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,5 +28,11 @@ public class PruefungsController {
                                                @RequestBody ErgebnisRequest request) {
         return AnmeldungResponse.von(
                 pruefungsService.ergebnisEintragen(id, request.status(), request.note()));
+    }
+    @PostMapping("/nachtragen")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnmeldungResponse nachtragen(@RequestBody NachtragRequest request) {
+        return AnmeldungResponse.von(
+                pruefungsService.nachtragen(request.modulId(), request.datum(), request.status(), request.note()));
     }
 }
