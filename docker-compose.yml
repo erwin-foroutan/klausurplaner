@@ -1,2 +1,9 @@
 services:
-  
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: klausurplaner
+      POSTGRES_USER: klausurplaner
+      POSTGRES_PASSWORD: geheim
+    ports:
+        - "5432:5432"
