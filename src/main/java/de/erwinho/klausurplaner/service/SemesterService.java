@@ -27,7 +27,7 @@ public class SemesterService {
         int aktuell = studienprofilService.aktuellesSemester();
 
         // Alle Anmeldungen einmal laden und nach Modul-ID gruppieren
-        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAll().stream()
+        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAllMitModul().stream()
                 .collect(Collectors.groupingBy(a -> a.getModul().getId()));
 
         // Für jedes Modul die Übersicht berechnen
