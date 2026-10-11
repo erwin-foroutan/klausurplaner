@@ -1,5 +1,7 @@
 # Klausurplaner
 
+[![CI](https://github.com/erwin-foroutan/klausurplaner/actions/workflows/ci.yml/badge.svg)](https://github.com/erwin-foroutan/klausurplaner/actions/workflows/ci.yml)
+
 REST-API zur Planung des Informatik-Studiums an der Hochschule RheinMain:
 Studienverlauf, Prüfungsanmeldungen mit Versuchsregeln, Lernzeiten und Lernziele.
 
