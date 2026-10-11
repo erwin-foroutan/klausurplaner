@@ -10,10 +10,10 @@ Studienverlauf, Prüfungsanmeldungen mit Versuchsregeln, Lernzeiten und Lernziel
 - *Studienplan* – alle 30 Module des B.Sc. Angewandte Informatik (PO 2024) werden beim Start automatisch angelegt
 - *Aktuelles Semester* – wird aus dem Studienbeginn berechnet (Studienstart immer im Wintersemester)
 - *Prüfungsanmeldungen mit echten Prüfungsregeln*
-    - maximal 3 Versuche pro Modul
-    - „nicht angetreten“ zählt nicht als Versuch
-    - Warnung vor dem letzten Versuch, Sperre nach endgültigem Nichtbestehen
-    - Note 1,0–4,0 bei bestanden, automatisch 5,0 bei nicht bestanden
+  - maximal 3 Versuche pro Modul
+  - „nicht angetreten“ zählt nicht als Versuch
+  - Warnung vor dem letzten Versuch, Sperre nach endgültigem Nichtbestehen
+  - Note 1,0–4,0 bei bestanden, automatisch 5,0 bei nicht bestanden
 - *Semesterübersicht* – Module des aktuellen Semesters plus alle offenen Module aus früheren Semestern, inkl. erreichter ECTS
 - *Lerneinheiten und Lernziele* – Lernzeit pro Modul erfassen, Fortschritt gegenüber dem Ziel in Prozent
 - *Validierung und Fehlerbehandlung* – verständliche Fehlermeldungen mit passenden HTTP-Statuscodes (400 / 409)
@@ -21,9 +21,11 @@ Studienverlauf, Prüfungsanmeldungen mit Versuchsregeln, Lernzeiten und Lernziel
 ## Tech-Stack
 
 - Java 25, Spring Boot (Web, Data JPA, Validation)
-- PostgreSQL 17 in Docker
+- PostgreSQL 17
 - Lombok
 - JUnit 5
+- Docker (Multi-Stage-Build) und Docker Compose
+- GitHub Actions (CI: Tests bei jedem Push)
 - Bruno (API-Tests, Collection im Ordner bruno/)
 
 ## Architektur
@@ -39,23 +41,35 @@ Controller  →  Service  →  Repository  →  PostgreSQL
 
 ## Starten
 
+### Mit Docker (empfohlen)
+
+Voraussetzung: Docker
+
+bash
+docker compose --profile app up --build
+
+
+Startet Datenbank und Anwendung zusammen. Die API läuft dann unter http://localhost:8080.
+
+### Für die Entwicklung
+
 Voraussetzungen: Java 25, Docker
 
 bash
-# Datenbank starten
+# Nur die Datenbank starten
 docker compose up -d
 
 # Anwendung starten (Windows: mvnw.cmd)
 ./mvnw spring-boot:run
 
 
-Die API läuft dann unter http://localhost:8080.
-
 ## Tests
 
 bash
 ./mvnw test
 
+
+Die Tests laufen außerdem automatisch bei jedem Push über GitHub Actions.
 
 ## API-Überblick
 
@@ -77,4 +91,3 @@ bash
 
 - Login mit Spring Security, damit jeder Nutzer eigene Daten hat
 - Frontend mit React und TypeScript
-- Docker-Image für die Anwendung und CI mit GitHub Actions
