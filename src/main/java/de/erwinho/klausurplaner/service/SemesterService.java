@@ -60,7 +60,8 @@ public class SemesterService {
                 PruefungsService.bestimmeStatus(anmeldungen),
                 PruefungsService.fehlversuche(anmeldungen),
                 PruefungsService.istLetzterVersuch(anmeldungen),
-                PruefungsService.bestandeneNote(anmeldungen)
+                PruefungsService.bestandeneNote(anmeldungen),
+                PruefungsService.offeneAnmeldungId(anmeldungen)
         );
     }
 }

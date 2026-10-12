@@ -1,5 +1,5 @@
 import type { ModulStatus, ModulUebersicht } from './types'
-
+import ModulAktionen from './ModulAktionen'
 const statusStil: Record<ModulStatus, { text: string; klasse: string }> = {
     OFFEN: { text: 'Offen', klasse: 'bg-gray-100 text-gray-700' },
     ANGEMELDET: { text: 'Angemeldet', klasse: 'bg-blue-100 text-blue-700' },
@@ -14,8 +14,7 @@ const kategorieFarbe: Record<string, string> = {
     FACHUEBERGREIFEND: 'border-l-purple-500',
 }
 
-export default function ModulKarte({ modul }: { modul: ModulUebersicht }) {
-    const status = statusStil[modul.status]
+export default function ModulKarte({ modul, onFertig }: { modul: ModulUebersicht; onFertig: () => void }) {    const status = statusStil[modul.status]
     const farbe = kategorieFarbe[modul.kategorie] ?? 'border-l-gray-300'
 
     return (
@@ -43,6 +42,7 @@ export default function ModulKarte({ modul }: { modul: ModulUebersicht }) {
                     ⚠️ Letzter Versuch – bei Nichtbestehen Exmatrikulation
                 </p>
             )}
+            <ModulAktionen modul={modul} onFertig={onFertig} />
         </div>
     )
 }

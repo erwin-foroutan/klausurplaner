@@ -1,6 +1,6 @@
 package de.erwinho.klausurplaner.dto;
+
 import de.erwinho.klausurplaner.entity.Kategorie;
-import de.erwinho.klausurplaner.entity.Modul;
 import de.erwinho.klausurplaner.entity.ModulStatus;
 
 public record ModulUebersicht(
@@ -12,6 +12,7 @@ public record ModulUebersicht(
         ModulStatus status,
         long fehlversuche,
         boolean letzterVersuch,
-        Double note
+        Double note,
+        Long offeneAnmeldungId
 ) {
 }

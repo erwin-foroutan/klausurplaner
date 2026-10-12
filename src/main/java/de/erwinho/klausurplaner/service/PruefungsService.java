@@ -118,4 +118,11 @@ public class PruefungsService {
                 .findFirst()
                 .orElse(null);
     }
+    static Long offeneAnmeldungId(List<Pruefungsanmeldung> anmeldungen) {
+        return anmeldungen.stream()
+                .filter(a -> a.getStatus() == PruefungsStatus.ANGEMELDET)
+                .map(Pruefungsanmeldung::getId)
+                .findFirst()
+                .orElse(null);
+    }
 }

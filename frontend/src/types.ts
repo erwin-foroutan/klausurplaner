@@ -6,10 +6,11 @@ export interface ModulUebersicht {
     semester: number
     ects: number
     kategorie: string
-    status:ModulStatus
-    fehlversuche:number
-    letzterVersuch:boolean
-    note:number | null
+    status: ModulStatus
+    fehlversuche: number
+    letzterVersuch: boolean
+    note: number | null
+    offeneAnmeldungId: number | null
 }
 
 export interface SemesterUebersicht {
