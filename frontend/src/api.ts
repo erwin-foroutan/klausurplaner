@@ -28,3 +28,25 @@ export function rueckgaengig(modulId: number) {
 export function setzeStudienbeginn(startJahr: number) {
     return senden('/studienprofil', 'PUT', { startJahr })
 }
+
+function semesterBeginn() {
+    const heute = new Date()
+    const jahr = heute.getFullYear()
+    const monat = heute.getMonth() + 1
+    if (monat >= 10) return jahr + '-10-01'
+    if (monat >= 4) return jahr + '-04-01'
+    return jahr - 1 + '-10-01'
+}
+
+export function lerneinheitErfassen(modulId: number, dauerMinuten: number, thema: string) {
+    return senden('/lerneinheiten', 'POST', { modulId, dauerMinuten, thema: thema || null })
+}
+
+export function lernzielAnlegen(modulId: number, zielStunden: number, deadline: string) {
+    return senden('/lernziele', 'POST', {
+        modulId,
+        zielStunden,
+        startDatum: semesterBeginn(),
+        deadline,
+    })
+}

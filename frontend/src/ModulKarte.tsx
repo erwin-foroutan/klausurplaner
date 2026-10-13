@@ -1,5 +1,6 @@
 import type { ModulStatus, ModulUebersicht } from './types'
 import ModulAktionen from './ModulAktionen'
+import LernBereich from './LernBereich'
 const statusStil: Record<ModulStatus, { text: string; klasse: string }> = {
     OFFEN: { text: 'Offen', klasse: 'bg-gray-100 text-gray-700' },
     ANGEMELDET: { text: 'Angemeldet', klasse: 'bg-blue-100 text-blue-700' },
@@ -43,6 +44,9 @@ export default function ModulKarte({ modul, onFertig }: { modul: ModulUebersicht
                 </p>
             )}
             <ModulAktionen modul={modul} onFertig={onFertig} />
+            {modul.status !== 'BESTANDEN' && modul.status !== 'ENDGUELTIG_NICHT_BESTANDEN' && (
+                <LernBereich modulId={modul.modulId} />
+            )}
         </div>
     )
 }

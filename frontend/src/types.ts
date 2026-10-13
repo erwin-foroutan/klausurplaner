@@ -18,3 +18,26 @@ export interface SemesterUebersicht {
     erreichteEcts: number
     module: ModulUebersicht[]
 }
+
+export interface Lernziel {
+    id: number
+    modulId: number
+    modulName: string
+    zielStunden: number
+    startDatum: string
+    deadline: string
+    beschreibung: string | null
+    gelernteMinuten: number
+    fortschrittProzent: number
+    verbleibendeTage: number
+}
+
+export interface Lerneinheit {
+    id: number
+    modulId: number
+    modulName: string
+    datum: string
+    dauerMinuten: number
+    thema: string | null
+    notiz: string | null
+}
