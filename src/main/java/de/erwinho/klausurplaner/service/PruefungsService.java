@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -46,6 +47,13 @@ public class PruefungsService {
         Pruefungsanmeldung anmeldung = anmelden(modulId, datum);
         setzeErgebnis(anmeldung, status, note);
         return anmeldungRepository.save(anmeldung);
+    }
+    @Transactional
+    public void letzteRueckgaengig(Long modulId) {
+        Pruefungsanmeldung letzte = anmeldungRepository.findByModulId(modulId).stream()
+                .max(Comparator.comparing(Pruefungsanmeldung::getId))
+                .orElseThrow(() -> new IllegalStateException("Für dieses Modul gibt es nichts rückgängig zu machen"));
+        anmeldungRepository.delete(letzte);
     }
     static void setzeErgebnis(Pruefungsanmeldung anmeldung, PruefungsStatus status, Double note) {
         if (anmeldung.getStatus() != PruefungsStatus.ANGEMELDET) {
@@ -125,4 +133,5 @@ public class PruefungsService {
                 .findFirst()
                 .orElse(null);
     }
+
 }

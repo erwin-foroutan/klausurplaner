@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { ModulUebersicht } from './types'
 import { anmelden, ergebnisEintragen } from './api'
+import RueckgaengigButton from './RueckgaengigButton'
 
 type Props = { modul: ModulUebersicht; onFertig: () => void }
 
@@ -12,11 +13,9 @@ export default function ModulAktionen({ modul, onFertig }: Props) {
     const [fehler, setFehler] = useState<string | null>(null)
     const [laedt, setLaedt] = useState(false)
 
-    if (modul.status === 'BESTANDEN' || modul.status === 'ENDGUELTIG_NICHT_BESTANDEN') {
-        return null
-    }
-
     const istAngemeldet = modul.status === 'ANGEMELDET'
+    const abgeschlossen = modul.status === 'BESTANDEN' || modul.status === 'ENDGUELTIG_NICHT_BESTANDEN'
+    const kannRueckgaengig = modul.status !== 'OFFEN' || modul.fehlversuche > 0
 
     async function absenden(e: FormEvent) {
         e.preventDefault()
@@ -41,12 +40,17 @@ export default function ModulAktionen({ modul, onFertig }: Props) {
 
     if (!offen) {
         return (
-            <button
-                onClick={() => setOffen(true)}
-                className="mt-3 text-sm font-medium text-blue-600 hover:underline"
-            >
-                {istAngemeldet ? 'Ergebnis eintragen' : 'Zur Prüfung anmelden'}
-            </button>
+            <div className="mt-3 flex items-center gap-4">
+                {!abgeschlossen && (
+                    <button
+                        onClick={() => setOffen(true)}
+                        className="text-sm font-medium text-blue-600 hover:underline"
+                    >
+                        {istAngemeldet ? 'Ergebnis eintragen' : 'Zur Prüfung anmelden'}
+                    </button>
+                )}
+                {kannRueckgaengig && <RueckgaengigButton modulId={modul.modulId} onFertig={onFertig} />}
+            </div>
         )
     }
 

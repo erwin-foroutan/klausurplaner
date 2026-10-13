@@ -25,29 +25,34 @@ public class SemesterService {
 
     public SemesterUebersicht aktuellesSemester() {
         int aktuell = studienprofilService.aktuellesSemester();
-
-        // Alle Anmeldungen einmal laden und nach Modul-ID gruppieren
-        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAllMitModul().stream()
-                .collect(Collectors.groupingBy(a -> a.getModul().getId()));
-
-        // Für jedes Modul die Übersicht berechnen
-        List<ModulUebersicht> alle = modulRepository.findAll().stream()
-                .map(m -> uebersicht(m, anmeldungenProModul.getOrDefault(m.getId(), List.of())))
-                .toList();
+        List<ModulUebersicht> alle = alleModule();
 
         int erreichteEcts = alle.stream()
                 .filter(u -> u.status() == ModulStatus.BESTANDEN)
                 .mapToInt(ModulUebersicht::ects)
                 .sum();
 
-        // Aktuelles Semester + alles Offene aus früheren Semestern
         List<ModulUebersicht> relevant = alle.stream()
                 .filter(u -> u.semester() == aktuell
                         || (u.semester() < aktuell && u.status() != ModulStatus.BESTANDEN))
-                .sorted(Comparator.comparingInt(ModulUebersicht::semester))
                 .toList();
 
         return new SemesterUebersicht(aktuell, erreichteEcts, relevant);
+    }
+
+    public List<ModulUebersicht> verlauf() {
+        return alleModule();
+    }
+
+    private List<ModulUebersicht> alleModule() {
+        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAllMitModul().stream()
+                .collect(Collectors.groupingBy(a -> a.getModul().getId()));
+
+        return modulRepository.findAll().stream()
+                .map(m -> uebersicht(m, anmeldungenProModul.getOrDefault(m.getId(), List.of())))
+                .sorted(Comparator.comparingInt(ModulUebersicht::semester)
+                        .thenComparing(ModulUebersicht::modulId))
+                .toList();
     }
 
     private ModulUebersicht uebersicht(Modul modul, List<Pruefungsanmeldung> anmeldungen) {

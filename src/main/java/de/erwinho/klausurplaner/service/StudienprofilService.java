@@ -14,6 +14,11 @@ public class StudienprofilService {
     private final StudienprofilRepository studienprofilRepository;
 
     public Studienprofil speichern(int startJahr) {
+        LocalDate heute = LocalDate.now();
+        int spaetestesJahr = heute.getMonthValue() >= 10 ? heute.getYear() : heute.getYear() - 1;
+        if (startJahr > spaetestesJahr) {
+            throw new IllegalArgumentException("Das Wintersemester " + startJahr + " hat noch nicht begonnen");
+        }
         Studienprofil profil = studienprofilRepository.findAll().stream()
                 .findFirst()
                 .orElseGet(Studienprofil::new);

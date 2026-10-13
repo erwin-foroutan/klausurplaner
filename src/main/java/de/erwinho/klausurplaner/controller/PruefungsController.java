@@ -36,4 +36,9 @@ public class PruefungsController {
         return AnmeldungResponse.von(
                 pruefungsService.nachtragen(request.modulId(), request.datum(), request.status(), request.note()));
     }
+    @DeleteMapping("/modul/{modulId}/letzte")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void letzteRueckgaengig(@PathVariable Long modulId) {
+        pruefungsService.letzteRueckgaengig(modulId);
+    }
 }
