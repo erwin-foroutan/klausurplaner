@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
+      '/auth': backend,
       '/module': backend,
       '/studienprofil': backend,
       '/semester': backend,

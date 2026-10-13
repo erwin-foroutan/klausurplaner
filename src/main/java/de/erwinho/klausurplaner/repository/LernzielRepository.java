@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface LernzielRepository extends JpaRepository<Lernziel, Long> {
 
-    List<Lernziel> findByModulId(Long modulId);
+    List<Lernziel> findByModulIdAndBenutzerId(Long modulId, Long benutzerId);
 }

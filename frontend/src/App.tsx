@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router'
 import Dashboard from './Dashboard'
 import Verlauf from './Verlauf'
+import Login from './Login'
+import { abmelden, holeEmail, holeToken } from './auth'
 
 function navKlasse({ isActive }: { isActive: boolean }) {
     return (
@@ -10,6 +13,17 @@ function navKlasse({ isActive }: { isActive: boolean }) {
 }
 
 function App() {
+    const [eingeloggt, setEingeloggt] = useState(holeToken() !== null)
+
+    function ausloggen() {
+        abmelden()
+        setEingeloggt(false)
+    }
+
+    if (!eingeloggt) {
+        return <Login onLogin={() => setEingeloggt(true)} />
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             <nav className="border-b bg-white">
@@ -21,6 +35,12 @@ function App() {
                     <NavLink to="/verlauf" className={navKlasse}>
                         Studienverlauf
                     </NavLink>
+                    <div className="ml-auto flex items-center gap-3 text-sm">
+                        <span className="hidden text-gray-500 sm:inline">{holeEmail()}</span>
+                        <button onClick={ausloggen} className="text-gray-600 hover:text-red-600 hover:underline">
+                            Abmelden
+                        </button>
+                    </div>
                 </div>
             </nav>
 

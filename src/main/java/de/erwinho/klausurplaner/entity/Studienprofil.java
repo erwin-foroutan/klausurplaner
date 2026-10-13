@@ -16,6 +16,9 @@ public class Studienprofil {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    private Benutzer benutzer;
+
     @Column(nullable = false)
     private int startJahr;
 }

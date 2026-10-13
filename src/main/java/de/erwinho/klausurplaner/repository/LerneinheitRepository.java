@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface LerneinheitRepository extends JpaRepository<Lerneinheit, Long> {
 
-    List<Lerneinheit> findByModulIdOrderByDatumDesc(Long modulId);
+    List<Lerneinheit> findByModulIdAndBenutzerIdOrderByDatumDesc(Long modulId, Long benutzerId);
 
-    List<Lerneinheit> findByModulIdAndDatumBetween(Long modulId, LocalDate von, LocalDate bis);
+    List<Lerneinheit> findByModulIdAndBenutzerIdAndDatumBetween(
+            Long modulId, Long benutzerId, LocalDate von, LocalDate bis);
 }

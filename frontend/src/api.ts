@@ -1,5 +1,7 @@
+import { authFetch } from './auth'
+
 async function senden(url: string, methode: string, body?: unknown) {
-    const res = await fetch(url, {
+    const res = await authFetch(url, {
         method: methode,
         headers: { 'Content-Type': 'application/json' },
         body: body === undefined ? undefined : JSON.stringify(body),

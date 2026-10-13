@@ -17,6 +17,9 @@ public class Pruefungsanmeldung {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Benutzer benutzer;
+
     @ManyToOne(optional = false)
     private Modul modul;
 

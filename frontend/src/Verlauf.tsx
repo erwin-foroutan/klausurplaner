@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { ModulStatus, ModulUebersicht } from './types'
 import RueckgaengigButton from './RueckgaengigButton'
+import { authFetch } from './auth'
 
 const statusFarbe: Record<ModulStatus, string> = {
     OFFEN: 'bg-white border-gray-200',
@@ -16,7 +17,7 @@ export default function Verlauf() {
     const [fehler, setFehler] = useState<string | null>(null)
 
     const laden = useCallback(() => {
-        fetch('/semester/verlauf')
+        authFetch('/semester/verlauf')
             .then((res) => {
                 if (!res.ok) throw new Error('Fehler ' + res.status)
                 return res.json()

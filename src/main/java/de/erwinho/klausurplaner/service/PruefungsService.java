@@ -4,6 +4,7 @@ import de.erwinho.klausurplaner.entity.Modul;
 import de.erwinho.klausurplaner.entity.ModulStatus;
 import de.erwinho.klausurplaner.entity.Pruefungsanmeldung;
 import de.erwinho.klausurplaner.entity.PruefungsStatus;
+import de.erwinho.klausurplaner.repository.BenutzerRepository;
 import de.erwinho.klausurplaner.repository.ModulRepository;
 import de.erwinho.klausurplaner.repository.PruefungsanmeldungRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,56 +23,47 @@ public class PruefungsService {
 
     private final PruefungsanmeldungRepository anmeldungRepository;
     private final ModulRepository modulRepository;
+    private final BenutzerRepository benutzerRepository;
 
-    public Pruefungsanmeldung anmelden(Long modulId, LocalDate datum) {
+    public Pruefungsanmeldung anmelden(Long benutzerId, Long modulId, LocalDate datum) {
         Modul modul = modulRepository.findById(modulId)
                 .orElseThrow(() -> new IllegalArgumentException("Modul mit ID " + modulId + " nicht gefunden"));
 
-        List<Pruefungsanmeldung> bisher = anmeldungRepository.findByModulId(modulId);
+        List<Pruefungsanmeldung> bisher = anmeldungRepository.findByModulIdAndBenutzerId(modulId, benutzerId);
         pruefeAnmeldungErlaubt(bisher);
 
         Pruefungsanmeldung anmeldung = new Pruefungsanmeldung();
+        anmeldung.setBenutzer(benutzerRepository.getReferenceById(benutzerId));
         anmeldung.setModul(modul);
         anmeldung.setDatum(datum);
         anmeldung.setStatus(PruefungsStatus.ANGEMELDET);
         return anmeldungRepository.save(anmeldung);
     }
-    public Pruefungsanmeldung ergebnisEintragen(Long anmeldungId, PruefungsStatus status, Double note) {
-        Pruefungsanmeldung anmeldung = anmeldungRepository.findById(anmeldungId)
+
+    public Pruefungsanmeldung ergebnisEintragen(Long benutzerId, Long anmeldungId, PruefungsStatus status, Double note) {
+        Pruefungsanmeldung anmeldung = anmeldungRepository.findByIdAndBenutzerId(anmeldungId, benutzerId)
                 .orElseThrow(() -> new IllegalArgumentException("Anmeldung mit ID " + anmeldungId + " nicht gefunden"));
         setzeErgebnis(anmeldung, status, note);
         return anmeldungRepository.save(anmeldung);
     }
+
     @Transactional
-    public Pruefungsanmeldung nachtragen(Long modulId, LocalDate datum, PruefungsStatus status, Double note) {
-        Pruefungsanmeldung anmeldung = anmelden(modulId, datum);
+    public Pruefungsanmeldung nachtragen(Long benutzerId, Long modulId, LocalDate datum, PruefungsStatus status, Double note) {
+        Pruefungsanmeldung anmeldung = anmelden(benutzerId, modulId, datum);
         setzeErgebnis(anmeldung, status, note);
         return anmeldungRepository.save(anmeldung);
     }
+
     @Transactional
-    public void letzteRueckgaengig(Long modulId) {
-        Pruefungsanmeldung letzte = anmeldungRepository.findByModulId(modulId).stream()
+    public void letzteRueckgaengig(Long benutzerId, Long modulId) {
+        Pruefungsanmeldung letzte = anmeldungRepository.findByModulIdAndBenutzerId(modulId, benutzerId).stream()
                 .max(Comparator.comparing(Pruefungsanmeldung::getId))
                 .orElseThrow(() -> new IllegalStateException("Für dieses Modul gibt es nichts rückgängig zu machen"));
         anmeldungRepository.delete(letzte);
     }
-    static void setzeErgebnis(Pruefungsanmeldung anmeldung, PruefungsStatus status, Double note) {
-        if (anmeldung.getStatus() != PruefungsStatus.ANGEMELDET) {
-            throw new IllegalStateException("Für diese Anmeldung wurde bereits ein Ergebnis eingetragen");
-        }
-        switch (status) {
-            case BESTANDEN -> {
-                if (note == null || note < 1.0 || note > 4.0) {
-                    throw new IllegalArgumentException("Bei bestanden muss die Note zwischen 1,0 und 4,0 liegen");
-                }
-                anmeldung.setNote(note);
-            }
-            case NICHT_BESTANDEN -> anmeldung.setNote(5.0);
-            case NICHT_ANGETRETEN -> anmeldung.setNote(null);
-            case ANGEMELDET -> throw new IllegalArgumentException("ANGEMELDET ist kein Ergebnis");
-        }
-        anmeldung.setStatus(status);
-    }
+
+    // ---------- Regeln ----------
+
     static long fehlversuche(List<Pruefungsanmeldung> anmeldungen) {
         return anmeldungen.stream()
                 .filter(a -> a.getStatus() == PruefungsStatus.NICHT_BESTANDEN)
@@ -104,6 +96,25 @@ public class PruefungsService {
             throw new IllegalStateException("Es gibt bereits eine offene Anmeldung für dieses Modul");
         }
     }
+
+    static void setzeErgebnis(Pruefungsanmeldung anmeldung, PruefungsStatus status, Double note) {
+        if (anmeldung.getStatus() != PruefungsStatus.ANGEMELDET) {
+            throw new IllegalStateException("Für diese Anmeldung wurde bereits ein Ergebnis eingetragen");
+        }
+        switch (status) {
+            case BESTANDEN -> {
+                if (note == null || note < 1.0 || note > 4.0) {
+                    throw new IllegalArgumentException("Bei bestanden muss die Note zwischen 1,0 und 4,0 liegen");
+                }
+                anmeldung.setNote(note);
+            }
+            case NICHT_BESTANDEN -> anmeldung.setNote(5.0);
+            case NICHT_ANGETRETEN -> anmeldung.setNote(null);
+            case ANGEMELDET -> throw new IllegalArgumentException("ANGEMELDET ist kein Ergebnis");
+        }
+        anmeldung.setStatus(status);
+    }
+
     static ModulStatus bestimmeStatus(List<Pruefungsanmeldung> anmeldungen) {
         if (istBestanden(anmeldungen)) {
             return ModulStatus.BESTANDEN;
@@ -126,6 +137,7 @@ public class PruefungsService {
                 .findFirst()
                 .orElse(null);
     }
+
     static Long offeneAnmeldungId(List<Pruefungsanmeldung> anmeldungen) {
         return anmeldungen.stream()
                 .filter(a -> a.getStatus() == PruefungsStatus.ANGEMELDET)
@@ -133,5 +145,4 @@ public class PruefungsService {
                 .findFirst()
                 .orElse(null);
     }
-
 }

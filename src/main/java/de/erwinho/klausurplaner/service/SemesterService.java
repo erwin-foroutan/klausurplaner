@@ -23,9 +23,9 @@ public class SemesterService {
     private final ModulRepository modulRepository;
     private final PruefungsanmeldungRepository anmeldungRepository;
 
-    public SemesterUebersicht aktuellesSemester() {
-        int aktuell = studienprofilService.aktuellesSemester();
-        List<ModulUebersicht> alle = alleModule();
+    public SemesterUebersicht aktuellesSemester(Long benutzerId) {
+        int aktuell = studienprofilService.aktuellesSemester(benutzerId);
+        List<ModulUebersicht> alle = alleModule(benutzerId);
 
         int erreichteEcts = alle.stream()
                 .filter(u -> u.status() == ModulStatus.BESTANDEN)
@@ -40,12 +40,12 @@ public class SemesterService {
         return new SemesterUebersicht(aktuell, erreichteEcts, relevant);
     }
 
-    public List<ModulUebersicht> verlauf() {
-        return alleModule();
+    public List<ModulUebersicht> verlauf(Long benutzerId) {
+        return alleModule(benutzerId);
     }
 
-    private List<ModulUebersicht> alleModule() {
-        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAllMitModul().stream()
+    private List<ModulUebersicht> alleModule(Long benutzerId) {
+        Map<Long, List<Pruefungsanmeldung>> anmeldungenProModul = anmeldungRepository.findAllMitModul(benutzerId).stream()
                 .collect(Collectors.groupingBy(a -> a.getModul().getId()));
 
         return modulRepository.findAll().stream()

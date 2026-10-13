@@ -3,13 +3,14 @@ import type { SemesterUebersicht } from './types'
 import Fortschritt from './Fortschritt'
 import ModulKarte from './ModulKarte'
 import Studienbeginn from './Studienbeginn'
+import { authFetch } from './auth'
 
 export default function Dashboard() {
     const [daten, setDaten] = useState<SemesterUebersicht | null>(null)
     const [fehler, setFehler] = useState<string | null>(null)
 
     const laden = useCallback(() => {
-        fetch('/semester/aktuell')
+        authFetch('/semester/aktuell')
             .then((res) => {
                 if (!res.ok) throw new Error('Fehler ' + res.status)
                 return res.json()

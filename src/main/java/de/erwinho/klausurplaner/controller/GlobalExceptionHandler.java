@@ -2,6 +2,7 @@ package de.erwinho.klausurplaner.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,5 +39,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> unlesbaresJson(HttpMessageNotReadableException e) {
         return Map.of("fehler", "Ungültiges JSON oder ungültiger Wert (z. B. falscher Status oder falsches Datumsformat)");
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> falscheAnmeldedaten(BadCredentialsException e) {
+        return Map.of("fehler", e.getMessage());
     }
 }

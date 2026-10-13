@@ -8,6 +8,8 @@ import de.erwinho.klausurplaner.service.LernService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,28 +22,30 @@ public class LernController {
 
     @PostMapping("/lerneinheiten")
     @ResponseStatus(HttpStatus.CREATED)
-    public LerneinheitResponse lerneinheitErfassen(@Valid @RequestBody LerneinheitRequest r) {
+    public LerneinheitResponse lerneinheitErfassen(@AuthenticationPrincipal Jwt jwt,
+                                                   @Valid @RequestBody LerneinheitRequest r) {
         return LerneinheitResponse.von(lernService.lerneinheitErfassen(
-                r.modulId(), r.datum(), r.dauerMinuten(), r.thema(), r.notiz()));
+                BenutzerId.aus(jwt), r.modulId(), r.datum(), r.dauerMinuten(), r.thema(), r.notiz()));
     }
 
     @GetMapping("/module/{modulId}/lerneinheiten")
-    public List<LerneinheitResponse> lerneinheiten(@PathVariable Long modulId) {
-        return lernService.lerneinheiten(modulId).stream()
+    public List<LerneinheitResponse> lerneinheiten(@AuthenticationPrincipal Jwt jwt, @PathVariable Long modulId) {
+        return lernService.lerneinheiten(BenutzerId.aus(jwt), modulId).stream()
                 .map(LerneinheitResponse::von)
                 .toList();
     }
 
     @PostMapping("/lernziele")
     @ResponseStatus(HttpStatus.CREATED)
-    public LernzielResponse lernzielAnlegen(@Valid @RequestBody LernzielRequest r) {
+    public LernzielResponse lernzielAnlegen(@AuthenticationPrincipal Jwt jwt,
+                                            @Valid @RequestBody LernzielRequest r) {
         return lernService.alsResponse(lernService.lernzielAnlegen(
-                r.modulId(), r.zielStunden(), r.startDatum(), r.deadline(), r.beschreibung()));
+                BenutzerId.aus(jwt), r.modulId(), r.zielStunden(), r.startDatum(), r.deadline(), r.beschreibung()));
     }
 
     @GetMapping("/module/{modulId}/lernziele")
-    public List<LernzielResponse> lernziele(@PathVariable Long modulId) {
-        return lernService.lernziele(modulId).stream()
+    public List<LernzielResponse> lernziele(@AuthenticationPrincipal Jwt jwt, @PathVariable Long modulId) {
+        return lernService.lernziele(BenutzerId.aus(jwt), modulId).stream()
                 .map(lernService::alsResponse)
                 .toList();
     }
